@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petcare MMM Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230000A0'/%3E%3Ctext x='16' y='23' font-family='Arial,sans-serif' font-size='17' font-weight='800' fill='%2300D7B9' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<style>
+  /* ---------- Mars Petcare brand tokens ---------- */
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap;
+    src:url('/vendor/fonts/montserrat-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:700; font-display:swap;
+    src:url('/vendor/fonts/montserrat-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family:'Montserrat'; font-style:normal; font-weight:800; font-display:swap;
+    src:url('/vendor/fonts/montserrat-latin-800-normal.woff2') format('woff2'); }
+
+  :root{
+    --mars-blue:#0000A0; --mars-blue-dark:#000078; --mars-blue-tint:#ECECFA;
+    --mars-teal:#00D7B9; --mars-yellow:#FFDC00;
+    --ink:#16163F; --ink-soft:#4A4A6A; --ink-mute:#8585A3;
+    --surface:#FFFFFF; --surface-alt:#F6F6FC; --border:#DEDEF0;
+    --radius:14px; --shadow:0 2px 10px rgba(22,22,63,.07);
+    --font:'Mars Centra','Montserrat','Segoe UI',system-ui,-apple-system,sans-serif;
+    --c1:#4646D8; --c2:#E39A00; --c3:#00A98F; --c4:#E25D4A;
+    --c5:#7A52D1; --c6:#3F9E45; --c7:#E070A8; --c8:#2A6FB0;
+    --good:#1D7A3E; --warn:#B87A00; --bad:#C4372A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{font-family:var(--font); background:var(--surface-alt); color:var(--ink);
+       font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;}
+
+  header{background:var(--mars-blue); color:#fff; padding:0 28px;
+         display:flex; align-items:center; gap:18px; height:64px;
+         position:sticky; top:0; z-index:20; box-shadow:0 2px 12px rgba(0,0,120,.25);}
+  .wordmark{font-weight:800; letter-spacing:.04em; font-size:19px; white-space:nowrap;}
+  .wordmark .accent{color:var(--mars-teal);}
+  .tagline{font-size:12.5px; opacity:.75; border-left:1px solid rgba(255,255,255,.3);
+           padding-left:18px; display:none;}
+  @media(min-width:860px){ .tagline{display:block;} }
+  .health{margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12.5px; opacity:.9; text-align:right;}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--mars-teal); box-shadow:0 0 0 3px rgba(0,215,185,.25); flex:none;}
+
+  main{max-width:1220px; margin:0 auto; padding:26px 22px 80px;}
+  nav.tabs{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap;}
+  .tab{border:1.5px solid var(--border); background:var(--surface); color:var(--ink-soft);
+       padding:9px 20px; border-radius:999px; font-weight:700; font-size:14px; cursor:pointer;
+       font-family:var(--font); transition:all .15s;}
+  .tab:hover{border-color:var(--mars-blue); color:var(--mars-blue);}
+  .tab.active{background:var(--mars-blue); border-color:var(--mars-blue); color:#fff;}
+  .tab:disabled{opacity:.45; cursor:not-allowed;}
+  section.view{display:none;}
+  section.view.active{display:block;}
+
+  .grid{display:grid; gap:18px;}
+  @media(min-width:900px){ .grid.cols2{grid-template-columns:1fr 1fr;} .grid.cols3{grid-template-columns:repeat(3,1fr);} }
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+        box-shadow:var(--shadow); padding:22px; margin-bottom:0;}
+  .card h2{font-size:16px; font-weight:800; margin-bottom:4px;}
+  .card .sub{color:var(--ink-soft); font-size:13px; margin-bottom:16px;}
+  .stack > * + *{margin-top:18px;}
+
+  .btn{display:inline-flex; align-items:center; gap:8px; background:var(--mars-blue); color:#fff;
+       border:none; border-radius:999px; padding:11px 26px; font-weight:800; font-size:14px;
+       font-family:var(--font); cursor:pointer; transition:background .15s; text-decoration:none;}
+  .btn:hover{background:var(--mars-blue-dark);}
+  .btn:disabled{opacity:.5; cursor:wait;}
+  .btn.ghost{background:transparent; color:var(--mars-blue); border:1.5px solid var(--mars-blue);}
+  .btn.ghost:hover{background:var(--mars-blue-tint);}
+  .btn.sm{padding:7px 16px; font-size:12.5px;}
+  select,input[type=number],input[type=text]{font-family:var(--font); font-size:14px; color:var(--ink);
+       border:1.5px solid var(--border); border-radius:10px; padding:8px 11px; background:#fff; width:100%;}
+  select:focus,input:focus{outline:none; border-color:var(--mars-blue);}
+  label.fld{display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin:10px 0 4px;
+            text-transform:uppercase; letter-spacing:.05em;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{border:1.5px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px;
+        cursor:pointer; user-select:none; background:#fff; color:var(--ink-soft); font-weight:600;}
+  .chip.on{background:var(--mars-blue-tint); border-color:var(--mars-blue); color:var(--mars-blue);}
+  .chip.static{cursor:default;}
+  .chip .sw{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:7px;}
+
+  .filelist{display:flex; flex-direction:column; gap:8px; margin-top:8px;}
+  .filerow{display:flex; align-items:center; gap:12px; border:1.5px solid var(--border);
+           border-radius:10px; padding:10px 14px; cursor:pointer; background:#fff;}
+  .filerow:hover{border-color:var(--mars-blue);}
+  .filerow.sel{border-color:var(--mars-blue); background:var(--mars-blue-tint);}
+  .filerow .nm{font-weight:700; font-size:14px; overflow:hidden; text-overflow:ellipsis;}
+  .drop{border:2px dashed var(--border); border-radius:var(--radius); padding:22px; text-align:center;
+        color:var(--ink-soft); font-size:13.5px; margin-top:14px; transition:all .15s;}
+  .drop.over{border-color:var(--mars-teal); background:#F0FCFA;}
+
+  .tiles{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-bottom:18px;}
+  .tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+        padding:16px 18px; box-shadow:var(--shadow);}
+  .tile .k{font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-mute);}
+  .tile .v{font-size:25px; font-weight:800; margin-top:2px;}
+  .tile .v small{font-size:14px; color:var(--ink-soft); font-weight:700;}
+  .tile.accent{border-top:3px solid var(--mars-teal);}
+
+  .tblwrap{overflow-x:auto;}
+  table.data{border-collapse:collapse; width:100%; font-size:13px; white-space:nowrap;}
+  table.data th{text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em;
+        color:var(--ink-mute); border-bottom:2px solid var(--border); padding:8px 12px 6px;}
+  table.data td{border-bottom:1px solid var(--border); padding:8px 12px; color:var(--ink);}
+  table.data td.num{text-align:right; font-variant-numeric:tabular-nums;}
+  table.data th.num{text-align:right;}
+  table.data tr:last-child td{border-bottom:none;}
+  .pos{color:var(--good); font-weight:700;} .neg{color:var(--bad); font-weight:700;}
+
+  .chartbox{position:relative; height:340px; margin-top:8px;}
+  .chartbox.tall{height:380px;} .chartbox.short{height:300px;} .chartbox.mini{height:220px;}
+
+  .note{font-size:12.5px; color:var(--ink-mute); margin-top:10px;}
+  .banner{border-radius:10px; padding:12px 16px; font-size:13.5px; font-weight:600; margin-bottom:16px; border:1px solid;}
+  .banner.blue{background:var(--mars-blue-tint); border-color:#C9C9F0; color:var(--mars-blue);}
+  .banner.green{background:#EDFBF2; border-color:#BEE8CC; color:var(--good);}
+  .banner.amber{background:#FFF7E6; border-color:#F2DFAE; color:var(--warn);}
+  .banner.red{background:#FDEEEC; border-color:#F2C4BE; color:var(--bad);}
+
+  .badge{display:inline-block; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:.04em;}
+  .badge.ERROR{background:#FDEEEC; color:var(--bad);}
+  .badge.ATTENTION{background:#FFF7E6; color:var(--warn);}
+  .badge.INFO{background:var(--mars-blue-tint); color:var(--mars-blue);}
+  .badge.OK{background:#EDFBF2; color:var(--good);}
+
+  .aicard{background:linear-gradient(135deg,#F3F3FF 0%,#EDFBF8 100%); border:1px solid #D8D8F5;
+          border-radius:var(--radius); padding:18px 20px; margin-top:16px;}
+  .aicard .hd{font-size:11.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+              color:var(--mars-blue); margin-bottom:6px; display:flex; gap:8px; align-items:center;}
+  .aicard .hd .spark{width:8px; height:8px; border-radius:50%; background:var(--mars-teal);}
+  .aicard p{font-size:13.5px; color:var(--ink); line-height:1.65;}
+
+  .subtabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;}
+  .subtab{border:1.5px solid var(--border); background:#fff; color:var(--ink-soft); padding:7px 16px;
+          border-radius:999px; font-weight:700; font-size:12.5px; cursor:pointer; font-family:var(--font);}
+  .subtab.active{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .params{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; background:var(--surface-alt);
+          border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:16px;}
+  .params .p{min-width:130px; flex:0 1 auto;}
+  .params label{display:block; font-size:11px; font-weight:700; color:var(--ink-mute);
+                text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px;}
+
+  /* multi-select checkbox dropdown */
+  .ms{position:relative; min-width:170px;}
+  .ms-btn{width:100%; text-align:left; background:var(--surface); border:1.5px solid var(--border);
+          border-radius:10px; padding:8px 26px 8px 10px; font:inherit; font-size:13px; color:var(--ink);
+          cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .ms-btn:hover{border-color:var(--mars-blue);}
+  .ms.open .ms-btn{border-color:var(--mars-blue); box-shadow:0 0 0 3px rgba(0,0,160,.10);}
+  .ms-btn::after{content:'▾'; position:absolute; right:9px; top:50%; transform:translateY(-50%);
+                 color:var(--ink-mute); font-size:11px; pointer-events:none;}
+  .ms-btn.on{border-color:var(--mars-blue); font-weight:700;}
+  .ms-pop{display:none; position:absolute; z-index:50; top:calc(100% + 4px); left:0; min-width:100%;
+          max-width:320px; background:var(--surface); border:1.5px solid var(--border);
+          border-radius:10px; box-shadow:0 10px 28px rgba(0,0,0,.14); padding:8px;}
+  .ms.open .ms-pop{display:block;}
+  .ms-tools{display:flex; gap:6px; margin-bottom:6px;}
+  .ms-tools button{flex:1; font:inherit; font-size:11px; font-weight:700; padding:4px 6px; cursor:pointer;
+                   background:var(--surface-alt); border:1px solid var(--border); border-radius:7px;
+                   color:var(--ink-soft);}
+  .ms-tools button:hover{border-color:var(--mars-blue); color:var(--mars-blue);}
+  .ms-search{width:100%; margin-bottom:6px; font-size:12px; padding:6px 8px;}
+  .ms-list{max-height:210px; overflow-y:auto; display:flex; flex-direction:column; gap:1px;}
+  .ms-list label{display:flex; align-items:center; gap:7px; padding:4px 6px; border-radius:6px;
+                 font-size:12.5px; font-weight:500; text-transform:none; letter-spacing:0; margin:0;
+                 color:var(--ink); cursor:pointer;}
+  .ms-list label:hover{background:var(--surface-alt);}
+  .ms-list input{width:14px; height:14px; accent-color:var(--mars-blue); margin:0; flex:none;}
+  .ms-more{margin-top:6px; font-size:11px; color:var(--ink-mute); text-align:center;}
+  .findings{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
+  .finding{display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink-soft);}
+  .heat{border-collapse:collapse; font-size:11.5px;}
+  .heat th{font-size:10.5px; color:var(--ink-mute); padding:4px 6px; font-weight:700;}
+  .heat th.rot{writing-mode:vertical-rl; transform:rotate(200deg); max-height:110px; text-align:left; vertical-align:bottom;}
+  .heat td{width:34px; height:26px; text-align:center; border:1px solid #fff; border-radius:4px; color:var(--ink); font-weight:600;}
+  .loglines{background:var(--ink); color:#DDE3F0; border-radius:10px; font-family:ui-monospace,Consolas,monospace;
+            font-size:12px; padding:14px 16px; max-height:220px; overflow-y:auto; line-height:1.7;}
+
+  footer{max-width:1220px; margin:30px auto 0; padding:0 22px; color:var(--ink-mute); font-size:12.5px;}
+  #toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+         background:var(--ink); color:#fff; padding:12px 22px; border-radius:999px; font-size:13.5px;
+         font-weight:600; opacity:0; pointer-events:none; transition:all .25s; z-index:50; max-width:80vw;}
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  #toast.err{background:var(--bad);}
+  .spin{display:inline-block; width:14px; height:14px; border:2.5px solid rgba(255,255,255,.35);
+        border-top-color:#fff; border-radius:50%; animation:sp .7s linear infinite;}
+  .spin.dark{border-color:rgba(22,22,63,.2); border-top-color:var(--mars-blue);}
+  @keyframes sp{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body data-palette="#4646D8,#E39A00,#00A98F,#E25D4A,#7A52D1,#3F9E45,#E070A8,#2A6FB0">
+
+<header>
+  <div class="wordmark">PETCARE&nbsp;<span class="accent">MMM</span>&nbsp;STUDIO</div>
+  <div class="tagline">Google Meridian marketing mix modeling · runs on your machine</div>
+  <div class="health"><span class="dot"></span><span id="engineBadge">local · your data stays on this machine</span></div>
+</header>
+
+<main>
+  <nav class="tabs">
+    <button class="tab active" data-view="data">1 · Data</button>
+    <button class="tab" data-view="eda" id="tabEda" disabled>2 · Exploratory data analysis</button>
+    <button class="tab" data-view="model" id="tabModel" disabled>3 · Model</button>
+    <button class="tab" data-view="results" id="tabResults" disabled>4 · Results</button>
+    <button class="tab" data-view="optimizer" id="tabOpt" disabled>5 · Budget optimizer</button>
+  </nav>
+
+  <!-- ================= DATA ================= -->
+  <section class="view active" id="view-data">
+    <div class="grid cols2">
+      <div class="card">
+        <h2>Load your Excel file</h2>
+        <div class="sub"><b>Campaign-grain (long) format</b> — one row per DATE × retailer × sub-brand ×
+          marketing channel × campaign, carrying <i>CLICKS</i>, <i>IMPRESSIONS</i> and <i>SPEND</i> plus the
+          KPI. The app aggregates it into a <b>BRAND × week</b> panel for modeling and keeps the fine grain
+          for the <i>SUB_BRAND</i> / <i>MARKETING_CHANNEL</i> filters on every report.
+          The wide Meridian panel (one row per brand × week) and simple national files still load too.</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn ghost sm" href="/api/template">Download blank template (.xlsx)</a>
+          <span class="note" style="margin-top:6px;">Includes a column-by-column guide sheet.</span>
+        </div>
+        <div id="files" class="filelist"></div>
+        <div class="drop" id="drop">Drag &amp; drop an .xlsx here, or
+          <label style="color:var(--mars-blue); font-weight:700; cursor:pointer;">browse<input type="file" id="fileInput" accept=".xlsx,.xlsm,.xls" hidden></label>
+        </div>
+        <div class="note" id="dataDirNote"></div>
+      </div>
+      <div class="card">
+        <h2>Dataset &amp; detected mapping</h2>
+        <div class="sub" id="dsMeta">Nothing loaded yet.</div>
+        <div id="longBox" style="display:none;"></div>
+        <div id="dsChips" class="chips" style="margin-bottom:14px;"></div>
+        <div class="tblwrap" id="preview"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EDA ================= -->
+  <section class="view" id="view-eda">
+    <div class="banner blue" id="edaBanner">Reports generate automatically from the loaded data — adjust any parameter and recalculate.</div>
+    <div class="subtabs" id="edaTabs">
+      <button class="subtab active" data-eda="spend_media">Spend &amp; media units</button>
+      <button class="subtab" data-eda="variables">Variables (box plots)</button>
+      <button class="subtab" data-eda="population">Population scaling</button>
+      <button class="subtab" data-eda="relationships">Relationships</button>
+      <button class="subtab" data-eda="priors">Prior specifications</button>
+      <button class="subtab" data-eda="complete">Complete analysis</button>
+    </div>
+    <div id="edaBody"></div>
+  </section>
+
+  <!-- ================= MODEL ================= -->
+  <section class="view" id="view-model">
+    <div class="card">
+      <h2>Model setup</h2>
+      <div class="sub" id="modelSub">Choose the engine, confirm the mapping, and run.</div>
+      <label class="fld">Engine</label>
+      <div class="chips" id="engineChips">
+        <span class="chip on" data-eng="meridian">Google Meridian — Bayesian MCMC (minutes)</span>
+        <span class="chip" data-eng="classic">Classic ridge — instant preview (seconds)</span>
+      </div>
+      <div class="grid cols2" style="margin-top:8px;">
+        <div>
+          <label class="fld">KPI</label><select id="selKpi"></select>
+          <label class="fld">KPI type</label>
+          <select id="selKpiType">
+            <option value="revenue">revenue — KPI is money</option>
+            <option value="non_revenue">non_revenue — units / conversions</option>
+          </select>
+          <label class="fld">Revenue per KPI (non-revenue only)</label><select id="selRpk"></select>
+          <div id="meridianParams">
+            <label class="fld">Sampling — chains × (adapt + burn-in + keep)</label>
+            <div style="display:flex; gap:8px;">
+              <input type="number" id="mChains" value="4" min="1" max="16" title="chains">
+              <input type="number" id="mAdapt" value="500" min="50" step="50" title="adapt">
+              <input type="number" id="mBurn" value="500" min="0" step="50" title="burn-in">
+              <input type="number" id="mKeep" value="1000" min="100" step="100" title="keep">
+            </div>
+            <label class="fld">Max lag (adstock weeks) · knots · seed</label>
+            <div style="display:flex; gap:8px;">
+              <input type="number" id="mLag" value="8" min="0" max="52">
+              <input type="number" id="mKnots" placeholder="auto">
+              <input type="number" id="mSeed" value="1">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="fld">Paid media channels</label><div class="chips" id="chipChannels"></div>
+          <label class="fld">Organic media</label><div class="chips" id="chipOrganic"></div>
+          <label class="fld">Non-media treatments</label><div class="chips" id="chipNonMedia"></div>
+          <label class="fld">Controls</label><div class="chips" id="chipControls"></div>
+        </div>
+      </div>
+      <div style="margin-top:22px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <button class="btn" id="btnRun">Run model</button>
+        <span class="note" id="runNote"></span>
+      </div>
+      <div id="mProgress" style="display:none; margin-top:16px;">
+        <div class="loglines" id="mLog"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  <section class="view" id="view-results">
+    <div id="resBanner"></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="grid">
+      <div class="card">
+        <h2>Model fit — actual vs predicted</h2>
+        <div class="sub" id="fitSub"></div>
+        <div class="chartbox"><canvas id="chFit"></canvas></div>
+      </div>
+      <div class="card">
+        <h2 id="decompTitle">What drove the KPI each week</h2>
+        <div class="sub" id="decompSub"></div>
+        <div class="chartbox tall"><canvas id="chDecomp"></canvas></div>
+      </div>
+      <div class="grid cols2">
+        <div class="card">
+          <h2>Return on investment by channel</h2>
+          <div class="sub" id="roiSub">Posterior mean with 90% credible interval.</div>
+          <div class="chartbox short"><canvas id="chRoi"></canvas></div>
+        </div>
+        <div class="card">
+          <h2>Share of media-driven KPI</h2>
+          <div class="sub">How the media-driven total splits across channels.</div>
+          <div class="chartbox short"><canvas id="chShare"></canvas></div>
+        </div>
+      </div>
+      <div class="card" id="curvesCard">
+        <h2>Response curves — where returns diminish</h2>
+        <div class="sub">Expected weekly contribution at a steady weekly spend level. Dots mark current average weekly spend.</div>
+        <div class="chartbox tall"><canvas id="chCurves"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Channel detail</h2>
+        <div class="sub">The full numbers behind every chart above.</div>
+        <div class="tblwrap" id="summaryTable"></div>
+        <div class="note" id="summaryNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OPTIMIZER ================= -->
+  <section class="view" id="view-optimizer">
+    <div class="card">
+      <h2>Reallocate a weekly budget</h2>
+      <div class="sub" id="optSub"></div>
+      <div class="grid cols3">
+        <div><label class="fld">Total weekly budget</label><input type="number" id="optBudget" min="0" step="1000"></div>
+        <div><label class="fld">Min share per channel (%)</label><input type="number" id="optMin" value="0" min="0" max="100"></div>
+        <div><label class="fld">Max share per channel (%)</label><input type="number" id="optMax" value="60" min="1" max="100"></div>
+      </div>
+      <div style="margin-top:18px;"><button class="btn" id="btnOpt">Optimize allocation</button></div>
+    </div>
+    <div id="optOut" style="margin-top:18px; display:none;">
+      <div class="tiles" id="optTiles"></div>
+      <div class="grid cols2">
+        <div class="card">
+          <h2>Current vs recommended weekly spend</h2>
+          <div class="chartbox"><canvas id="chAlloc"></canvas></div>
+        </div>
+        <div class="card">
+          <h2>Allocation detail</h2>
+          <div class="tblwrap" id="allocTable"></div>
+          <div class="note" id="allocNote"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Petcare MMM Studio v2 · Google Meridian + classic engine · runs entirely on this machine · REST API at <code>/docs</code> · MCP server for Claude Desktop included.</footer>
+<div id="toast"></div>
+
+<script src="/vendor/chart.umd.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

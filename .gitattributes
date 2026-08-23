@@ -1,0 +1,9 @@
+# Normalize text to LF in the repo, check out native on each platform.
+* text=auto
+
+# Windows batch files must keep CRLF or cmd.exe can misparse them.
+*.bat text eol=crlf
+
+# Binary assets
+*.xlsx binary
+*.woff2 binary

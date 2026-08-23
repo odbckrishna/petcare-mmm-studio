@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Generated sample data — rebuild with:  python scripts/generate_sample_data.py
+# (or util\install.bat). Excluded so the repo stays small and history stays clean.
+data/*.xlsx
+data/*.xlsm
+data/*.xls
+data/.cache/
+templates/*.xlsx
+
+# Meridian reports and job state
+reports/*.html
+reports/_job/
+
+# Runtime logs
+logs/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ...but keep the directories themselves
+!data/.gitkeep
+!reports/.gitkeep
+!templates/.gitkeep
+
+# Excel lock/temp artifacts
+~$*
+data/[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]
+util/_*.txt
