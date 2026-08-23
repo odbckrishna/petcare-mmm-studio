@@ -38,9 +38,12 @@ tab — a synthetic campaign-grain Petcare dataset (73,865 METRIC/VALUE rows ≈
 6 brands × 14 sub-brands × 7 channels × 5 retailers × 157 Saturday weeks ×
 5 metrics, H2 2023 → H1 2026) so every screen works before you bring your own data.
 
-The first load parses the workbook (~40 s) and caches it under `data/.cache/`;
-every load after that takes about a second. The cache is keyed on the file's
-timestamp, so replacing the workbook refreshes it automatically.
+The sample workbooks ship with the repo, so a fresh clone works immediately —
+no generation step needed. The first load parses the workbook (~40 s) and caches
+it under `data/.cache/`; every load after that takes about a second. The cache is
+keyed on the file's timestamp, so replacing the workbook refreshes it
+automatically. To rebuild the samples from scratch, run
+`python scripts/generate_sample_data.py`.
 
 Windows: use `py -m pip install -r requirements.txt` and `py run.py` if `pip`/`python` aren't found.
 Apple Silicon: TensorFlow installs as `tensorflow-macos` automatically via Meridian's dependencies.

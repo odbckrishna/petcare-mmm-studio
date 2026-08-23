@@ -6,13 +6,13 @@ __pycache__/
 venv/
 env/
 
-# Generated sample data — rebuild with:  python scripts/generate_sample_data.py
-# (or util\install.bat). Excluded so the repo stays small and history stays clean.
-data/*.xlsx
+# Sample data and the blank template ARE tracked (~9 MB) so the repo works on
+# clone with no setup. Regenerate them with:
+#   python scripts/generate_sample_data.py   (or util\install.bat)
+# Uploaded workbooks from the UI are not tracked - only the known samples.
 data/*.xlsm
 data/*.xls
 data/.cache/
-templates/*.xlsx
 
 # Meridian reports and job state
 reports/*.html
